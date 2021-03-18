@@ -1,5 +1,6 @@
 ---
-- hosts: web
+- name: Deploy docker container into the Web Server
+  hosts: web
   become: yes
   tasks:
     - name: Install python pip
