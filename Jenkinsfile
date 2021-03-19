@@ -1,18 +1,14 @@
 properties([pipelineTriggers([githubPush()])])
 pipeline{
-    agent { label 'slave1'}
+    agent { 
+	  label 'slave1'
+	}
     tools {
       maven 'maven3'
     }
    
     stages{
-        /*stage('SCM'){
-            steps{
-                git credentialsId: 'github', 
-                    url: 'https://github.com/KhafazovPavlo/final_project'
-            }
-        }*/
-        
+       
         stage('Checkout SCM'){
             steps {
                 checkout([
@@ -51,10 +47,10 @@ pipeline{
         }
         stage('Docker Deploy'){
             steps{
-              ansiblePlaybook credentialsId: 'dev-server', disableHostKeyChecking: true, 
+              ansiblePlaybook credentialsId: 'web-server', disableHostKeyChecking: true, 
                 extras: "-e BUILD_TAG=${BUILD_TAG}", installation: 'ansible', inventory: 'web.inv', 
                     playbook: 'deploy-docker.yml'
             }
         }
     }
-}    
+} 
