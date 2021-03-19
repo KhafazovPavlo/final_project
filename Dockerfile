@@ -1,19 +1,32 @@
-FROM centos
+# Use a minimal image as parent
+FROM openjdk:8-jdk-alpine
 
-MAINTAINER pavel.khafazov@gmail.com
+# Environment variables
+ENV TOMCAT_MAJOR=8 \
+    TOMCAT_VERSION=8.5.37 \
+    CATALINA_HOME=/opt/tomcat
 
-RUN mkdir /opt/tomcat/
+# init
+RUN apk -U upgrade --update && \
+    apk add curl && \
+    apk add ttf-dejavu
 
-WORKDIR /opt/tomcat
-RUN curl -O https://www-eu.apache.org/dist/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz
-RUN tar xvfz apache*.tar.gz
-RUN mv apache-tomcat-8.5.40/* /opt/tomcat/.
-RUN yum -y install java
-RUN java -version
+RUN mkdir -p /opt
 
-WORKDIR /opt/tomcat/webapps
-COPY target/*.war /usr/local/tomcat/webapps/app.war
+# install tomcat
+RUN curl -jkSL -o /tmp/apache-tomcat.tar.gz http://archive.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz && \
+    gunzip /tmp/apache-tomcat.tar.gz && \
+    tar -C /opt -xf /tmp/apache-tomcat.tar && \
+    ln -s /opt/apache-tomcat-$TOMCAT_VERSION $CATALINA_HOME
+
+# cleanup
+RUN apk del curl && \
+    rm -rf /tmp/* /var/cache/apk/*
 
 EXPOSE 8080
 
-CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+COPY target/*.war /usr/local/tomcat/webapps/app.war
+
+WORKDIR $CATALINA_HOME
+
+CMD ["$CATALINA_HOME/bin/catalina.sh", "run"]
