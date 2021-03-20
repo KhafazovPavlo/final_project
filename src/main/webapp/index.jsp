@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 <TITLE>DevOps-Project</TITLE>
-<BODY bgcolor="grey" onload=Elastic()>
+<BODY bgcolor="white" >
 <CENTER>
 <br><br><br><br>
 <br><br><br><br>
