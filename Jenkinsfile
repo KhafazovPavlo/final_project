@@ -34,7 +34,7 @@ pipeline{
         stage('DockerHub Push'){
             steps{
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
-                    sh "sudo docker login -u pavelkhafazov -p ${dockerHubPwd}"
+                    sh 'sudo docker login -u pavelkhafazov -p ${dockerHubPwd}'
                 }
                 
                 sh "sudo docker push pavelkhafazov/webapp:${BUILD_TAG} "
@@ -51,6 +51,13 @@ pipeline{
                 extras: "-e BUILD_TAG=${BUILD_TAG}", installation: 'ansible', inventory: 'web.inv', 
                     playbook: 'deploy-docker.yml'
             }
+        }
+    }
+	post {
+    always {
+       mail to: 'pavel.khafazov@gmail.com',
+          subject: "Status of pipeline: ${currentBuild.fullDisplayName}",
+          body: "${env.BUILD_URL} has result ${currentBuild.result}"
         }
     }
 } 
